@@ -1,0 +1,58 @@
+pkgname=dotfiles-nvim
+pkgver=0.0.1
+pkgrel=1
+pkgdesc="Provide base nvim configuration."
+arch=('any')
+license=('MIT')
+depends=()
+optdepends=(
+  'bash-language-server: bashls support for nvim-lspconfig'
+  'ccls: ccls support for nvim-lspconfig'
+  'dart: dartls support for nvim-lspconfig'
+  'dockerfile-language-server: dockerls support for nvim-lspconfig'
+  'gopls: gopls support for nvim-lspconfig'
+  'python-language-server: pylsp support for nvim-lspconfig'
+  'rust-analyzer: rust_analyzer support for nvim-lspconfig'
+  'terraform-ls: terraformls support for nvim-lspconfig'
+  'typescript-language-server: tsserver support for nvim-lspconfig'
+)
+source=(
+  'colors.vim'
+  'statusline.vim'
+  'init.lua'
+  'plugins-cmp.lua'
+  'plugins-ctrlsf.lua'
+  'plugins-init.lua'
+  'plugins-indent-blankline.lua'
+  'plugins-lsp-config.lua'
+  'plugins-telescope.lua'
+  'plugins-treesitter.lua'
+  'plugins-quick-scope.lua'
+  'options.lua'
+)
+sha256sums=(
+  'SKIP'
+  'SKIP'
+  'SKIP'
+  'SKIP'
+  'SKIP'
+  'SKIP'
+  'SKIP'
+  'SKIP'
+  'SKIP'
+  'SKIP'
+  'SKIP'
+  'SKIP'
+)
+
+package() {
+  install -dm755 "$pkgdir/usr/share/$pkgname/.config/nvim/lua"
+  install -dm755 "$pkgdir/usr/share/$pkgname/.config/nvim/colors"
+  install -Dm644 "$srcdir/colors.vim" "$pkgdir/usr/share/$pkgname/.config/nvim/colors/terminal.vim"
+  install -Dm644 "$srcdir/statusline.vim" "$pkgdir/usr/share/$pkgname/.config/nvim/plugin/statusline.vim"
+  install -Dm644 "$srcdir/init.lua" "$pkgdir/usr/share/$pkgname/.config/nvim/init.lua"
+  install -Dm644 "$srcdir/options.lua" "$pkgdir/usr/share/$pkgname/.config/nvim/lua/options.lua"
+  for f in plugins-*; do
+    install -Dm644 "$srcdir/$f" "$pkgdir/usr/share/$pkgname/.config/nvim/lua/plugins/${f/plugins-/}"
+  done
+}

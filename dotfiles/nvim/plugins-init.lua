@@ -34,6 +34,6 @@ return require("packer").startup {
     use(require'plugins.ctrlsf')
   end,
   config = {
-    compile_path = vim.fn.stdpath('data') .. '/site/pack/loader/start/packer.nvim/plugin/packer.lua',
+    compile_path = install_path .. '/plugin/packer_compiled.lua',
   }
 }

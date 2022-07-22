@@ -1,0 +1,29 @@
+#!/bin/bash
+
+# Generate a wireguard configuration file for use with wg-quick
+# Example:
+# ```
+# keep-wg | sudo tee /etc/wireguard/wg0.conf
+# sudo systemctl restart wg-quick@wg0
+# ```
+
+set -e
+server_ip=$(ssh -G wireguard | awk '/^hostname/ { print $2 }')
+privkey="$(wg genkey)"
+
+exec 3<>"/dev/tcp/${server_ip}/42912"
+wg pubkey <<<"${privkey}" >&3
+IFS=: read -r status server_pubkey server_port internal_ip <&3
+
+[[ $status == OK ]]
+cat <<EOF
+[Interface]
+Address = ${internal_ip}/24
+ListenPort = 51871
+PrivateKey = ${privkey}
+
+[Peer]
+PublicKey = ${server_pubkey}
+AllowedIPs = 192.168.4.0/24
+Endpoint = ${server_ip}:${server_port}
+EOF

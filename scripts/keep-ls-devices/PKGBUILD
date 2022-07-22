@@ -1,0 +1,19 @@
+script=keep-ls-devices
+pkgname=scripts-$script
+pkgver=0.0.1
+pkgrel=1
+pkgdesc="List devices on the keep network."
+arch=('any')
+license=('MIT')
+depends=()
+optdepends=()
+source=(
+  "$script"
+)
+sha256sums=(
+  'SKIP'
+)
+
+package() {
+  install -Dm755 "$srcdir/$script" "$pkgdir/usr/local/bin/$script"
+}

@@ -1,0 +1,29 @@
+#!/bin/bash
+
+lookup() {
+  local ip host
+  ip=$1; shift
+
+  host=$(timeout 5 ssh "${ip}" "hostname" 2>/dev/null)
+  printf "%s %s\n" "${ip}" "${host}"
+}
+
+PREV=
+while true; do
+  # Match wg configs that:
+  # - were last seen less than x minutes ago
+  # - have a public ip in the ATT network
+  CUR=$(
+    ssh wireguard "sudo wg show all dump" \
+      | awk -v "cutoff=$(($(date +%s) - 300))" '$4 ~ /^166/ && $6 > cutoff { print $5 }'
+  )
+
+  # Only check new configs.
+  DIFF=$(comm -1 -3 <(sort <<<"$PREV") <(sort <<<"$CUR"))
+  for cidr in $DIFF; do
+    lookup "${cidr%%/*}" &
+  done
+
+  PREV=$CUR
+  sleep 2
+done

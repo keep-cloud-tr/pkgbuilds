@@ -1,0 +1,53 @@
+_appiumname=appium
+_appiumver=1.16.0
+_drivername=appium-flutter-driver
+_driverver=0.0.35
+pkgname=appium-flutter
+pkgver=$_appiumver
+pkgrel=1
+pkgdesc="A test automation framework for use with native, hybrid and mobile web apps"
+arch=(any)
+url="https://github.com/appium-userland/appium-flutter-driver"
+license=('APACHE2', 'MIT')
+depends=('nodejs')
+makedepends=('jq' 'npm')
+source=(
+"https://registry.npmjs.org/$_appiumname/-/$_appiumname-$_appiumver.tgz"
+"https://registry.npmjs.org/$_drivername/-/$_drivername-$_driverver.tgz"
+)
+sha1sums=(
+'fb58a6cec93636892749c42d25d4396450223260'
+'e4a1d379d91d6738692ca6d40a6e019c014328bc'
+)
+noextract=(
+"$_appiumname-$_appiumver.tgz"
+"$_drivername-$_driverver.tgz"
+)
+
+package() {
+    npm install -g --user root --cache "${srcdir}/npm-cache" --prefix "$pkgdir/usr" "$srcdir/$_appiumname-$_appiumver.tgz"
+    npm install -g --user root --cache "${srcdir}/npm-cache" --prefix "$pkgdir/usr" "$srcdir/$_drivername-$_driverver.tgz"
+
+    # Fix permissions
+    find "$pkgdir"/usr -type d -exec chmod 755 {} +
+
+    # npm gives ownership of ALL FILES to build user
+    # https://bugs.archlinux.org/task/63396
+    chown -R root:root "${pkgdir}"
+
+    # Remove references to pkgdir
+    find "$pkgdir" -type f -name package.json -print0 | xargs -0 sed -i "/_where/d"
+
+    # Remove references to srcdir
+    local tmppackage="$(mktemp)"
+    local pkgjson="$pkgdir/usr/lib/node_modules/$_appiumname/package.json"
+    jq '.|=with_entries(select(.key|test("_.+")|not))' "$pkgjson" > "$tmppackage"
+    mv "$tmppackage" "$pkgjson"
+    chmod 644 "$pkgjson"
+
+    local tmppackage="$(mktemp)"
+    local pkgjson="$pkgdir/usr/lib/node_modules/$_drivername/package.json"
+    jq '.|=with_entries(select(.key|test("_.+")|not))' "$pkgjson" > "$tmppackage"
+    mv "$tmppackage" "$pkgjson"
+    chmod 644 "$pkgjson"
+}

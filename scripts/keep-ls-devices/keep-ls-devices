@@ -1,11 +1,34 @@
 #!/bin/bash
 
 lookup() {
-  local ip host
+  local ip name
   ip=$1; shift
 
-  host=$(timeout 5 ssh "${ip}" "hostname" 2>/dev/null)
-  printf "%s %s\n" "${ip}" "${host}"
+  # Try ssh and telnet in parallel.
+  name=$({ ssh_name "${ip}" & telnet_name "${ip}" & wait; } | head -n 1)
+  printf "%s %s\n" "${ip}" "${name}"
+}
+
+ssh_name() {
+  local ip
+  ip=$1; shift
+
+  timeout 5 ssh "${ip}" "hostname" 2>/dev/null
+}
+
+telnet_name() {
+  local ip
+  ip=$1; shift
+
+  {
+    sleep 1
+    echo root
+    sleep 1
+    echo "cat /tmp/knight/opt/config/thing.json"
+    sleep 1
+  } \
+    | timeout 5 telnet "${ip}" 2>/dev/null \
+    | awk -F '[[:space:]"]+' '/thing_name/ { print $4 }'
 }
 
 PREV=

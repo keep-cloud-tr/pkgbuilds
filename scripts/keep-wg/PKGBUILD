@@ -5,7 +5,10 @@ pkgrel=1
 pkgdesc="Set up keep network."
 arch=('any')
 license=('MIT')
-depends=()
+depends=(
+  wireguard-tools
+  openssh
+)
 optdepends=()
 source=(
   "$script"

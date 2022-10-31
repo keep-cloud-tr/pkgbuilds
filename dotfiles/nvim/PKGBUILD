@@ -1,6 +1,6 @@
 pkgname=dotfiles-nvim
 pkgver=0.0.5
-pkgrel=1
+pkgrel=2
 pkgdesc="Provide base nvim configuration."
 arch=('any')
 license=('MIT')
@@ -18,17 +18,17 @@ optdepends=(
 )
 source=(
   'colors.vim'
-  'statusline.vim'
   'init.lua'
+  'options.lua'
   'plugins-cmp.lua'
   'plugins-ctrlsf.lua'
-  'plugins-init.lua'
   'plugins-indent-blankline.lua'
+  'plugins-init.lua'
   'plugins-lsp-config.lua'
+  'plugins-quick-scope.lua'
   'plugins-telescope.lua'
   'plugins-treesitter.lua'
-  'plugins-quick-scope.lua'
-  'options.lua'
+  'statusline.vim'
 )
 sha256sums=(
   'SKIP'

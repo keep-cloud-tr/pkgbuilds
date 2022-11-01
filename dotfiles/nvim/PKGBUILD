@@ -1,6 +1,6 @@
 pkgname=dotfiles-nvim
-pkgver=0.0.5
-pkgrel=2
+pkgver=0.0.6
+pkgrel=1
 pkgdesc="Provide base nvim configuration."
 arch=('any')
 license=('MIT')
@@ -17,7 +17,7 @@ optdepends=(
   'typescript-language-server: tsserver support for nvim-lspconfig'
 )
 source=(
-  'colors.vim'
+  'colors.lua'
   'init.lua'
   'options.lua'
   'plugins-cmp.lua'
@@ -48,7 +48,7 @@ sha256sums=(
 package() {
   install -dm755 "$pkgdir/usr/share/$pkgname/.config/nvim/lua"
   install -dm755 "$pkgdir/usr/share/$pkgname/.config/nvim/colors"
-  install -Dm644 "$srcdir/colors.vim" "$pkgdir/usr/share/$pkgname/.config/nvim/colors/terminal.vim"
+  install -Dm644 "$srcdir/colors.lua" "$pkgdir/usr/share/$pkgname/.config/nvim/colors/terminal.lua"
   install -Dm644 "$srcdir/statusline.vim" "$pkgdir/usr/share/$pkgname/.config/nvim/plugin/statusline.vim"
   install -Dm644 "$srcdir/init.lua" "$pkgdir/usr/share/$pkgname/.config/nvim/init.lua"
   install -Dm644 "$srcdir/options.lua" "$pkgdir/usr/share/$pkgname/.config/nvim/lua/options.lua"

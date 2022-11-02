@@ -1,5 +1,5 @@
 pkgname=dotfiles-nvim
-pkgver=0.0.6
+pkgver=0.0.7
 pkgrel=1
 pkgdesc="Provide base nvim configuration."
 arch=('any')
@@ -28,7 +28,7 @@ source=(
   'plugins-quick-scope.lua'
   'plugins-telescope.lua'
   'plugins-treesitter.lua'
-  'statusline.vim'
+  'statusline.lua'
 )
 sha256sums=(
   'SKIP'
@@ -49,9 +49,9 @@ package() {
   install -dm755 "$pkgdir/usr/share/$pkgname/.config/nvim/lua"
   install -dm755 "$pkgdir/usr/share/$pkgname/.config/nvim/colors"
   install -Dm644 "$srcdir/colors.lua" "$pkgdir/usr/share/$pkgname/.config/nvim/colors/terminal.lua"
-  install -Dm644 "$srcdir/statusline.vim" "$pkgdir/usr/share/$pkgname/.config/nvim/plugin/statusline.vim"
   install -Dm644 "$srcdir/init.lua" "$pkgdir/usr/share/$pkgname/.config/nvim/init.lua"
   install -Dm644 "$srcdir/options.lua" "$pkgdir/usr/share/$pkgname/.config/nvim/lua/options.lua"
+  install -Dm644 "$srcdir/statusline.lua" "$pkgdir/usr/share/$pkgname/.config/nvim/lua/statusline.lua"
   for f in plugins-*; do
     install -Dm644 "$srcdir/$f" "$pkgdir/usr/share/$pkgname/.config/nvim/lua/plugins/${f/plugins-/}"
   done

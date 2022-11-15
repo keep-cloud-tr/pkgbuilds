@@ -33,12 +33,10 @@ telnet_name() {
 
 PREV=
 while true; do
-  # Match wg configs that:
-  # - were last seen less than x minutes ago
-  # - have a public ip in the ATT network
+  # Match wg configs that were last seen less than x minutes ago
   CUR=$(
     ssh wireguard "sudo wg show all dump" \
-      | awk -v "cutoff=$(($(date +%s) - 300))" '$4 ~ /^166/ && $6 > cutoff { print $5 }'
+      | awk -v "cutoff=$(($(date +%s) - 300))" '$6 > cutoff { print $5 }'
   )
 
   # Only check new configs.

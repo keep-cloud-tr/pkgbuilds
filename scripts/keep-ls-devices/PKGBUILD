@@ -1,6 +1,6 @@
 script=keep-ls-devices
 pkgname=scripts-$script
-pkgver=0.0.3
+pkgver=0.0.4
 pkgrel=1
 pkgdesc="List devices on the keep network."
 arch=('any')

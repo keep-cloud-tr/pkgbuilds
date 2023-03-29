@@ -1,5 +1,7 @@
 #!/bin/bash
 
+LOOKUP_TIMEOUT=10
+
 lookup() {
   local ip name
   ip=$1; shift
@@ -13,7 +15,7 @@ ssh_name() {
   local ip
   ip=$1; shift
 
-  timeout 5 ssh "${ip}" "hostname" 2>/dev/null
+  timeout $LOOKUP_TIMEOUT ssh "${ip}" "hostname" 2>/dev/null
 }
 
 telnet_name() {
@@ -21,15 +23,35 @@ telnet_name() {
   ip=$1; shift
 
   {
-    sleep 1
+    sleep $((LOOKUP_TIMEOUT / 2))
     echo root
-    sleep 1
-    echo "cat /tmp/knight/opt/config/thing.json"
-    sleep 1
+    sleep 2
+    echo "cat /tmp/knight/opt/config/thing.json /tmp/knight/factory/opt/config/thing.json /tmp/knight/update/opt/config/thing.json"
+    sleep 2
   } \
-    | timeout 5 telnet "${ip}" 2>/dev/null \
+    | timeout $LOOKUP_TIMEOUT telnet "${ip}" 2>/dev/null \
     | awk -F '[[:space:]"]+' '/thing_name/ { print $4 }'
 }
+
+if command -v expect >/dev/null 2>&1; then
+  LOOKUP_TIMEOUT=5
+
+  telnet_name() {
+    local ip
+    ip=$1; shift
+
+    expect -c "
+      set timeout 3
+      spawn timeout $LOOKUP_TIMEOUT telnet ${ip}
+      expect \"login:\"
+      send \"root\n\"
+      expect \"#\"
+      send \"cat /tmp/knight/opt/config/thing.json /tmp/knight/factory/opt/config/thing.json /tmp/knight/update/opt/config/thing.json\n\"
+      expect \"}\"
+      " 2>/dev/null \
+      | awk -F '[[:space:]"]+' '/thing_name/ { print $4 }'
+  }
+fi
 
 PREV=
 while true; do
@@ -43,8 +65,9 @@ while true; do
   DIFF=$(comm -1 -3 <(sort <<<"$PREV") <(sort <<<"$CUR"))
   for cidr in $DIFF; do
     lookup "${cidr%%/*}" &
+    #sleep 1
   done
 
   PREV=$CUR
-  sleep 2
+  sleep 5
 done

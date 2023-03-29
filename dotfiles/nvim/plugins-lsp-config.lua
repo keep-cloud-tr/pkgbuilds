@@ -73,9 +73,9 @@ return {
       "dartls",
       "dockerls",
       "gopls",
+      "lua_ls",
       "pylsp",
       "rust_analyzer",
-      "sumneko_lua",
       "terraformls",
       "tsserver",
     }

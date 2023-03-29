@@ -26,4 +26,5 @@ PrivateKey = ${privkey}
 PublicKey = ${server_pubkey}
 AllowedIPs = 192.168.4.0/24
 Endpoint = ${server_ip}:${server_port}
+PersistentKeepalive = 25
 EOF

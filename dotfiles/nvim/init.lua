@@ -31,3 +31,11 @@ vim.api.nvim_set_keymap('n', '<leader>h', [[<cmd>:set hlsearch! hlsearch?<CR>]],
 vim.cmd [[
 nnoremap <leader>c :setlocal conceallevel=<c-r>=&conceallevel < 3 ? &conceallevel + 1 : 0<CR><CR>
 ]]
+
+-- Hack to fix errors produced when running terraformls on .tfvars files.
+-- https://github.com/neovim/neovim/issues/23184
+vim.api.nvim_create_autocmd({ 'BufRead' }, {
+  pattern = '*.tfvars',
+  group = vim.api.nvim_create_augroup('tfvars', { clear = true }),
+  command = 'set filetype=terraform',
+})

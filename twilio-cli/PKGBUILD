@@ -1,0 +1,47 @@
+pkgname=nodejs-twilio-cli
+_pkgname=${pkgname#nodejs-}
+pkgver=5.9.0
+pkgrel=1
+pkgdesc="Manage your Twilio resources from your terminal"
+arch=(any)
+url="https://github.com/twilio/twilio-cli"
+license=("MIT")
+depends=('nodejs')
+optdepends=()
+makedepends=('npm' 'jq')
+source=(${_pkgname}-${pkgver}.tgz::http://github.com/twilio/$_pkgname/archive/refs/tags/$pkgver.tar.gz)
+noextract=($_pkgname-$pkgver.tgz)
+sha256sums=('ad157174e5f851684e0045ca11992d8db916b31b9e07a8cd01618f9ff1eaea4b')
+
+package() {
+    npm install -g \
+        --cache "${srcdir}/npm-cache" \
+        --prefix "${pkgdir}/usr" \
+        "${srcdir}/${_pkgname}-${pkgver}.tgz"
+
+    # Non-deterministic race in npm gives 777 permissions to random directories.
+    # See https://github.com/npm/cli/issues/1103 for details.
+    find "${pkgdir}/usr" -type d -exec chmod 755 {} +
+
+    # Remove references to $pkgdir
+    find "$pkgdir" -name package.json -print0 | xargs -r -0 sed -i '/_where/d'
+
+    # Remove references to $srcdir
+    local tmppackage="$(mktemp)"
+    local pkgjson="$pkgdir/usr/lib/node_modules/$_pkgname/package.json"
+    jq '.|=with_entries(select(.key|test("_.+")|not))' "$pkgjson" > "$tmppackage"
+    mv "$tmppackage" "$pkgjson"
+    chmod 644 "$pkgjson"
+
+    # remove manpages as they may contain a reference to $pkgdir
+    find "$pkgdir" -type f -name package.json | while read pkgjson; do
+        local tmppackage="$(mktemp)"
+        jq 'del(.man)' "$pkgjson" > "$tmppackage"
+        mv "$tmppackage" "$pkgjson"
+        chmod 644 "$pkgjson"
+    done
+
+    # npm gives ownership of ALL FILES to build user
+    # https://bugs.archlinux.org/task/63396
+    chown -R root:root "${pkgdir}"
+}
